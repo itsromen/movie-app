@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import Movie from "./Movie";
+import MovieCard from "./MovieCard";
 
 export default function Movies({
   search,
@@ -7,14 +7,16 @@ export default function Movies({
   setPage,
   searchedMovies,
   setSearchedMovies,
+  sortBy,
+  movies,
+  setMovies,
+  setId,
 }) {
-  const [movies, setMovies] = useState([]);
-
   const loaderRef = useRef(null);
 
-  const fetchMovies = async (page) => {
+  const fetchMovies = async (page, sortBy) => {
     const res = await fetch(
-      `https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&page=${page}&sort_by=popularity.desc`,
+      `https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&page=${page}&sort_by=${sortBy}`,
       {
         method: "GET",
         headers: {
@@ -52,7 +54,7 @@ export default function Movies({
     const signal = controller.signal;
     try {
       search && fetchSearch(page, search, signal);
-      !search && fetchMovies(page);
+      !search && fetchMovies(page, sortBy);
     } catch (err) {
       if (err.name === "AbortError") {
         return;
@@ -60,7 +62,7 @@ export default function Movies({
     }
 
     return () => controller.abort();
-  }, [page, search]);
+  }, [page, search, sortBy]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -81,7 +83,7 @@ export default function Movies({
       {search ? (
         <>
           {searchedMovies.map((m, i) => (
-            <Movie
+            <MovieCard
               key={i}
               year={m.release_date}
               title={m.title}
@@ -93,7 +95,9 @@ export default function Movies({
       ) : (
         <>
           {movies.map((m, i) => (
-            <Movie
+            <MovieCard
+              setId={setId}
+              id={m.id}
               key={i}
               year={m.release_date}
               title={m.title}
