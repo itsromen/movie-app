@@ -24,5 +24,36 @@ export default function Movie({ id }) {
     fetchMovie();
   }, []);
 
-  return <div>{details.title}</div>;
+  return (
+    <div className="flex gap-2 p-2 text-black/80">
+      <img
+        src={`https://image.tmdb.org/t/p/original/${details.poster_path}`}
+        alt={`${details.title} Poster`}
+        className="w-2/10"
+      />
+      <div className="flex flex-col gap-2">
+        <h1 className="text-5xl font-bold">{details.title}</h1>
+
+        <p className="flex gap-2">
+          <span className="font-bold">
+            {details.release_date?.split("-").reverse().join("/")}
+          </span>
+          &middot;
+          <span className="flex gap-2">
+            {details.genres?.map((g, i, a) =>
+              i === a.length - 1 ? (
+                <span key={g.id}>{g.name}</span>
+              ) : (
+                <span key={g.id}>{g.name},</span>
+              )
+            )}
+          </span>
+          &middot;
+          <span>{details.runtime} Minutes</span>
+          &middot;
+          <span>{details.vote_average?.toFixed(1)}/10</span>
+        </p>
+      </div>
+    </div>
+  );
 }
